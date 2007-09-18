@@ -233,7 +233,7 @@ build_args()
 # Execution begins here.
 
 # Don't use compiz when running the failsafe session
-if [ "$GNOME_DESKTOP_SESSION_ID" = "Failsafe" ]; then
+if [ "x$GNOME_DESKTOP_SESSION_ID" = "xFailsafe" ]; then
     abort_with_fallback_wm
 fi
 
