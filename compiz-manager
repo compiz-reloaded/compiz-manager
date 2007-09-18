@@ -1,19 +1,7 @@
 #!/bin/sh
-# Compiz wrapper
+# Compiz Manager wrapper script
 # 
-# parts taken from 
-#  git://anongit.opencompositing.org/users/3v1n0/compiz-wrapper
-# 
-# thanks to Treviño (3v1n0) <trevi55@gmail.com>, full copyright
-# notice below:
-# 
-# Compiz wrapper, born as loader in Ubuntu Packages
-#
-# Based on:
-#  Compiz Manager
-#  Copyright (c) 2007 Kristian Lyngstøl <kristian@bohemians.org>
-#
-# Addons by Treviño (3v1n0) <trevi55@gmail.com>
+# Copyright (c) 2007 Kristian Lyngstøl <kristian@bohemians.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,6 +18,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
+#
+# Contributions by: Treviño (3v1n0) <trevi55@gmail.com>, Ubuntu Packages
 #
 # Much of this code is based on Beryl code, also licensed under the GPL.
 # This script will detect what options we need to pass to compiz to get it
