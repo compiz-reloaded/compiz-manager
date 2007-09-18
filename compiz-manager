@@ -26,13 +26,26 @@
 # started, and start a default plugin and possibly window decorator.
 # 
 
-# Set to yes to enable verbose
-VERBOSE="yes"
 
+COMPIZ_BIN_PATH="/usr/local/bin/" # For window decorators and compiz
+PLUGIN_PATH="/usr/local/lib/compiz/" 
 GLXINFO="/usr/bin/glxinfo"
+KWIN="/usr/bin/kwin"
+METACITY="/usr/bin/metacity"
+COMPIZ_NAME="compiz" # Final name for compiz (compiz.real) 
 
-# driver blacklist
-BLACKLIST="nv vga vesa vmware via sis mga"
+# For Xgl LD_PRELOAD
+LIBGL_NVIDIA="/usr/lib/nvidia/libGL.so.1.2.xlibmesa"
+LIBGL_FGLRX="/usr/lib/fglrx/libGL.so.1.2.xlibmesa"
+
+# For detecting what driver is in use, the + is for one or more /'s
+XORG_DRIVER_PATH="/usr/lib/xorg/modules/drivers/+"
+
+FALLBACKWM="${METACITY}"
+FALLBACKWM_OPTIONS="--replace $@"
+
+# Driver whitelist
+WHITELIST="nvidia intel ati radeon"
 
 # blacklist based on the pci ids 
 T="1002:5954 1002:5854 1002:5955" # ati rs480
@@ -40,22 +53,24 @@ T="1002:5954 1002:5854 1002:5955" # ati rs480
 BLACKLIST_PCIIDS="$T"
 unset T
 
-
-COMPIZ_OPTIONS="--ignore-desktop-hints"
+COMPIZ_OPTIONS="--ignore-desktop-hints --replace"
 COMPIZ_PLUGINS=""
 ENV=""
 
-FALLBACKWM="/usr/bin/metacity"
-FALLBACKWM_OPTIONS="--replace $@"
+# Use emerald by default if it exist
+USE_EMERALD="yes"
 
 # No indirect by default
 INDIRECT="no"
+
+# Set to yes to enable verbose
+VERBOSE="yes"
 
 # Echos the arguments if verbose
 verbose()
 {
 	if [ "x$VERBOSE" = "xyes" ]; then
-		echo -n "$*"
+		printf "$*"
 	fi
 }
 
@@ -67,7 +82,7 @@ abort_with_fallback_wm()
     if [ -x $FALLBACKWM ]; then
 	exec $FALLBACKWM $FALLBACKWM_OPTIONS
     else
-	echo "no $FALLBACKWM found, exiting"
+	printf "no $FALLBACKWM found, exiting\n"
 	exit 1
     fi
 }
@@ -148,8 +163,8 @@ check_nvidia()
 	fi
 }
 
-# check driver blacklist
-running_under_blacklisted_driver()
+# check driver whitelist
+running_under_whitelisted_driver()
 {
     LOG=$(xset q|grep "Log file"|awk '{print $3}')
     if [ -z "$LOG" ];then
@@ -157,14 +172,14 @@ running_under_blacklisted_driver()
 	verbose "$(xset q) \n"
 	return 0
     fi
-    for DRV in ${BLACKLIST}; do
-	if egrep -q "Loading /usr/lib/xorg/modules/drivers/+${DRV}_drv\.so" $LOG &&
-	   ! egrep -q "Unloading /usr/lib/xorg/modules/drivers/+${DRV}_drv\.so" $LOG; 
+    for DRV in ${WHITELIST}; do
+	if egrep -q "Loading ${XORG_DRIVER_PATH}${DRV}_drv\.so" $LOG &&
+	   ! egrep -q "Unloading ${XORG_DRIVER_PATH}${DRV}_drv\.so" $LOG; 
 	then
-	    verbose "Blacklisted '$DRV' driver is in use \n"
 	    return 0
 	fi
     done
+    verbose "No whitelisted driver found\n"
     return 1
 }
 
@@ -190,12 +205,12 @@ build_env()
 		ENV="$ENV LIBGL_ALWAYS_INDIRECT=1 "
 	fi
 	if check_xgl; then
-		if [ -f /usr/lib/nvidia/libGL.so.1.2.xlibmesa ]; then
-			ENV="$ENV LD_PRELOAD=/usr/lib/nvidia/libGL.so.1.2.xlibmesa"
+		if [ -f ${LIBGL_NVIDIA} ]; then
+			ENV="$ENV LD_PRELOAD=${LIBGL_NVIDIA}"
 			verbose "Enabling Xgl with nVidia drivers...\n"
 		fi
-		if [ -f /usr/lib/fglrx/libGL.so.1.2.xlibmesa ]; then
-			ENV="$ENV LD_PRELOAD=/usr/lib/fglrx/libGL.so.1.2.xlibmesa"
+		if [ -f ${LIBGL_FGLRX} ]; then
+			ENV="$ENV LD_PRELOAD=${FGLRX}"
 			verbose "Enabling Xgl with fglrx ATi drivers...\n"
 		fi
 	fi
@@ -225,7 +240,7 @@ fi
 # if we run under Xgl, we can skip some tests here
 if ! check_xgl; then
     # if vesa or vga are in use, do not even try glxinfo (LP#119341)
-    if running_under_blacklisted_driver || have_blacklisted_pciid; then
+    if ! running_under_whitelisted_driver || have_blacklisted_pciid; then
 	abort_with_fallback_wm
     fi
     # check if we have the required bits to run compiz and if not, 
@@ -236,9 +251,9 @@ if ! check_xgl; then
 fi
 
 # load the ccp plugin if present and fallback to plain gconf if not
-if [ -f /usr/lib/compiz/libccp.so ]; then
+if [ -f ${PLUGIN_PATH}libccp.so ]; then
 	COMPIZ_PLUGINS="$COMPIZ_PLUGINS ccp"
-elif [ -f /usr/lib/compiz/libgconf.so ]; then
+elif [ -f ${PLUGIN_PATH}libgconf.so ]; then
 	COMPIZ_PLUGINS="$COMPIZ_PLUGINS glib gconf"
 fi
 
@@ -247,14 +262,16 @@ build_env
 build_args
 
 # start the gtk-window-decorator if present
-if [ -x /usr/bin/gtk-window-decorator ] && [ -n "$GNOME_DESKTOP_SESSION_ID" ]; then
+if [ -x ${COMPIZ_BIN_PATH}emerald ] && [ "$USE_EMERALD" = "yes" ]; then
+	verbose "Starting emerald\n"
+	${COMPIZ_BIN_PATH}emerald --replace &
+elif [ -x ${COMPIZ_BIN_PATH}gtk-window-decorator ] && [ -n "$GNOME_DESKTOP_SESSION_ID" ]; then
         verbose "Starting gtk-window-decorator\n"
-	/usr/bin/gtk-window-decorator --replace &
-elif [ -x /usr/bin/kde-window-decorator ] && [ -n "$KDE_FULL_SESSION" ]; then
+	${COMPIZ_BIN_PATH}gtk-window-decorator --replace &
+elif [ -x ${COMPIZ_BIN_PATH}kde-window-decorator ] && [ -n "$KDE_FULL_SESSION" ]; then
         verbose "Starting kde-window-decorator\n"
-        /usr/bin/kde-window-decorator --replace &
-	FALLBACKWM="/usr/bin/kwin"
+        ${COMPIZ_BIN_PATH}kde-window-decorator --replace &
+	FALLBACKWM="${KWIN}"
 fi
-
-/usr/bin/compiz.real $COMPIZ_OPTIONS "$@" $COMPIZ_PLUGINS || exec $FALLBACKWM $FALLBACKWM_OPTIONS
+${COMPIZ_BIN_PATH}${COMPIZ_NAME} $COMPIZ_OPTIONS "$@" $COMPIZ_PLUGINS || exec $FALLBACKWM $FALLBACKWM_OPTIONS
 
