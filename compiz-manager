@@ -294,6 +294,19 @@ build_args()
 ####################
 # Execution begins here.
 
+# Read configuration from XDG paths
+if [ -z "$XDG_CONFIG_DIRS" ]; then
+    test -f /etc/xdg/compiz/compiz-manager && . /etc/xdg/compiz/compiz-manager
+else
+    test -f $XDG_CONFIG_DIRS/compiz/compiz-manager
+fi
+
+if [ -z "$XDG_CONFIG_HOME" ]; then
+    test -f $HOME/.config/compiz/compiz-manager && . $HOME/.config/compiz/compiz-manager
+else
+    test -f $XDG_CONFIG_HOME/compiz/compiz-manager
+fi
+
 # Don't use compiz when running the failsafe session
 if [ "x$GNOME_DESKTOP_SESSION_ID" = "xFailsafe" ]; then
     abort_with_fallback_wm
@@ -334,6 +347,8 @@ fi
 # get environment
 build_env
 build_args
+
+exit 
 
 # start the gtk-window-decorator if present
 if [ -x ${COMPIZ_BIN_PATH}emerald ] && [ "$USE_EMERALD" = "yes" ]; then
