@@ -107,6 +107,30 @@ check_npot_texture()
 
 }
 
+# Check for presence of FBConfig
+check_fbconfig()
+{
+	verbose "Checking for FBConfig: "
+	if [ "$INDIRECT" = "yes" ]; then
+		$GLXINFO -i | grep -q GLX.*fbconfig 
+		FB=$?
+	else
+		$GLXINFO | grep -q GLX.*fbconfig 
+		FB=$?
+	fi
+
+	if [ $FB = "0" ]; then
+		unset FB
+		verbose "present. \n"
+		return 0;
+	else
+		unset FB
+		verbose "not present. \n"
+		return 1;
+	fi
+}
+
+
 # Check for TFP
 check_tfp()
 {
@@ -170,12 +194,17 @@ check_nvidia_memory()
 # Check for existence if NV-GLX
 check_nvidia()
 {
+	if [ ! -z $NVIDIA_INTERNAL_TEST ]; then
+		return $NVIDIA_INTERNAL_TEST;
+	fi
 	verbose "Checking for nVidia: "
 	if xdpyinfo | grep -q NV-GLX ; then
 		verbose "present. \n"
+		NVIDIA_INTERNAL_TEST=0
 		return 0;
 	else
 		verbose "not present. \n"
+		NVIDIA_INTERNAL_TEST=1
 		return 1;
 	fi
 }
@@ -287,6 +316,10 @@ if ! check_xgl; then
     fi
 
     if check_nvidia && ! check_nvidia_memory; then
+	abort_with_fallback_wm
+    fi
+
+    if ! check_fbconfig; then
 	abort_with_fallback_wm
     fi
 fi
