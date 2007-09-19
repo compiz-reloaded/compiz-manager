@@ -270,6 +270,10 @@ if [ "x$GNOME_DESKTOP_SESSION_ID" = "xFailsafe" ]; then
     abort_with_fallback_wm
 fi
 
+if [ "x$LIBGL_ALWAYS_INDIRECT" = "x1" ]; then
+    INDIRECT="yes";
+fi
+
 # if we run under Xgl, we can skip some tests here
 if ! check_xgl; then
     # if vesa or vga are in use, do not even try glxinfo (LP#119341)
