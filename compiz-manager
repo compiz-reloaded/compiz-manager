@@ -213,7 +213,7 @@ check_nvidia()
 check_texture_size()
 {
 	TEXTURE_LIMIT=$(glxinfo -l | grep GL_MAX_3D_TEXTURE_SIZE | sed 's/.*=[^0-9]//g')
-	RESOLUTION=$(xdpyinfo  | grep -i dimensions: | sed 's/pixels.*(.*)//' | sed 's/[^0-9x]*//')
+	RESOLUTION=$(xdpyinfo  | grep -i dimensions: | sed 's/[^0-9]*pixels.*(.*).*//' | sed 's/[^0-9x]*//')
 	VRES=$(echo $RESOLUTION | sed 's/.*x//')
 	HRES=$(echo $RESOLUTION | sed 's/x.*//')
 	verbose "Comparing resolution ($RESOLUTION) to maximum 3D texture size ($TEXTURE_LIMIT): ";
