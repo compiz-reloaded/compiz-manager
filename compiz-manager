@@ -180,6 +180,22 @@ check_nvidia()
 	fi
 }
 
+# Check if the max texture size is large enough compared to the resolution
+check_texture_size()
+{
+	TEXTURE_LIMIT=$(glxinfo -l | grep GL_MAX_3D_TEXTURE_SIZE | sed 's/.*=[^0-9]//g')
+	RESOLUTION=$(xdpyinfo  | grep -i dimensions: | sed 's/pixels.*(.*)//' | sed 's/[^0-9x]*//')
+	VRES=$(echo $RESOLUTION | sed 's/.*x//')
+	HRES=$(echo $RESOLUTION | sed 's/x.*//')
+	verbose "Comparing resolution ($RESOLUTION) to maximum 3D texture size ($TEXTURE_LIMIT): ";
+	if [ $VRES -gt $TEXTURE_LIMIT ] || [ $HRES -gt $TEXTURE_LIMIT ]; then
+		verbose "Failed.\n"
+		return 1;
+	fi
+	verbose "Passed.\n"
+	return 0
+}
+
 # check driver whitelist
 running_under_whitelisted_driver()
 {
@@ -262,7 +278,7 @@ if ! check_xgl; then
     fi
     # check if we have the required bits to run compiz and if not, 
     # fallback
-    if ! check_tfp || ! check_npot_texture || ! check_composite; then
+    if ! check_tfp || ! check_npot_texture || ! check_composite || ! check_texture_size; then
 	abort_with_fallback_wm
     fi
 
