@@ -38,6 +38,12 @@ COMPIZ_NAME="compiz" # Final name for compiz (compiz.real)
 LIBGL_NVIDIA="/usr/lib/nvidia/libGL.so.1.2.xlibmesa"
 LIBGL_FGLRX="/usr/lib/fglrx/libGL.so.1.2.xlibmesa"
 
+# Minimum amount of memory (in kilo bytes) that nVidia cards need
+# to be allowed to start
+# Set to 262144 to require 256MB
+NVIDIA_MEMORY="65536" # 64MB
+NVIDIA_SETTINGS="nvidia-settings" # Assume it's in the path by default
+
 # For detecting what driver is in use, the + is for one or more /'s
 XORG_DRIVER_PATH="/usr/lib/xorg/modules/drivers/+"
 
@@ -150,6 +156,17 @@ check_xgl()
 	fi
 }
 
+# Check if the nVidia card has enough video ram to make sense
+check_nvidia_memory()
+{
+	MEM=$(${NVIDIA_SETTINGS} -q VideoRam | egrep Attribute\ \'VideoRam\'\ .*: | cut -d: -f3 | sed 's/[^0-9]//g')
+	if [ $MEM -lt $NVIDIA_MEMORY ]; then
+		verbose "Less than ${NVIDIA_MEMORY}kb of memory and nVidia";
+		return 1;
+	fi
+	return 0;
+}
+
 # Check for existence if NV-GLX
 check_nvidia()
 {
@@ -248,6 +265,10 @@ if ! check_xgl; then
     if ! check_tfp || ! check_npot_texture || ! check_composite; then
 	abort_with_fallback_wm
     fi
+
+    if check_nvidia && ! check_nvidia_memory; then
+	abort_with_fallback_wm
+    fi
 fi
 
 # load the ccp plugin if present and fallback to plain gconf if not
@@ -273,5 +294,6 @@ elif [ -x ${COMPIZ_BIN_PATH}kde-window-decorator ] && [ -n "$KDE_FULL_SESSION" ]
         ${COMPIZ_BIN_PATH}kde-window-decorator --replace &
 	FALLBACKWM="${KWIN}"
 fi
+
 ${COMPIZ_BIN_PATH}${COMPIZ_NAME} $COMPIZ_OPTIONS "$@" $COMPIZ_PLUGINS || exec $FALLBACKWM $FALLBACKWM_OPTIONS
 
