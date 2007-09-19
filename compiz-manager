@@ -262,6 +262,8 @@ have_blacklisted_pciid()
 	    return 0
 	fi
     done
+    OUTPUT=$(lspci -vn | grep -i VGA)
+    verbose "Detected PCI ID for VGA: $OUTPUT\n"
     return 1
 }
 
