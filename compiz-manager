@@ -272,7 +272,7 @@ build_env()
 			verbose "Enabling Xgl with nVidia drivers...\n"
 		fi
 		if [ -f ${LIBGL_FGLRX} ]; then
-			ENV="$ENV LD_PRELOAD=${FGLRX}"
+			ENV="$ENV LD_PRELOAD=${LIBGL_FGLRX}"
 			verbose "Enabling Xgl with fglrx ATi drivers...\n"
 		fi
 	fi
