@@ -296,7 +296,7 @@ build_env()
 build_args()
 {
 	if [ $INDIRECT = "yes" ]; then
-	COMPIZ_OPTIONS="$COMPIZ_OPTIONS --indirect-rendering "
+		COMPIZ_OPTIONS="$COMPIZ_OPTIONS --indirect-rendering "
 	fi
 	if check_nvidia; then
 		COMPIZ_OPTIONS="$COMPIZ_OPTIONS --loose-binding"
