@@ -71,6 +71,9 @@ USE_EMERALD="yes"
 # No indirect by default
 INDIRECT="no"
 
+# Default X.org log if xset q doesn't reveal it
+XORG_DEFAULT_LOG="/var/log/Xorg.0.log"
+
 # Set to yes to enable verbose
 VERBOSE="yes"
 
@@ -236,6 +239,10 @@ check_texture_size()
 running_under_whitelisted_driver()
 {
 	LOG=$(xset q|grep "Log file"|awk '{print $3}')
+	if [ "$LOG" = "" ]; then
+	    verbose "xset q doesn't reveal the location of the log file. Using fallback $XORG_DEFAULT_LOG \n"
+	    LOG=$XORG_DEFAULT_LOG;
+	fi
 	if [ -z "$LOG" ];then
 		verbose "AIEEEEH, no Log file found \n"
 		verbose "$(xset q) \n"
