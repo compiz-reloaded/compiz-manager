@@ -302,11 +302,13 @@ build_env()
 
 build_args()
 {
-	if [ $INDIRECT = "yes" ]; then
+	if [ "x$INDIRECT" = "xyes" ]; then
 		COMPIZ_OPTIONS="$COMPIZ_OPTIONS --indirect-rendering "
 	fi
 	if check_nvidia; then
-		COMPIZ_OPTIONS="$COMPIZ_OPTIONS --loose-binding"
+		if [ "x$INDIRECT" != "xyes" ]; then
+			COMPIZ_OPTIONS="$COMPIZ_OPTIONS --loose-binding"
+		fi
 	fi
 }
 
