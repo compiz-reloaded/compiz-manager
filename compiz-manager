@@ -92,6 +92,11 @@ abort_with_fallback_wm()
 		verbose "SKIP_CHECKS is yes, so continuing despite problems.\n"
 		return 0;
 	fi
+	
+	if [ "x$CM_DRY" = "xyes" ]; then
+		verbose "Dry run failed: Problems detected with 3D support.'n"
+		exit 1;
+	fi
 
 	verbose "aborting and using fallback: $FALLBACKWM \n"
 
@@ -369,6 +374,10 @@ fi
 build_env
 build_args
 
+if [ "x$CM_DRY" = "xyes" ]; then
+	verbose "Dry run finished: everything should work with regards to Compiz and 3D.\n"
+	exit 0;
+fi
 # start the gtk-window-decorator if present
 if [ -x ${COMPIZ_BIN_PATH}emerald ] && [ "$USE_EMERALD" = "yes" ]; then
 	verbose "Starting emerald\n"
