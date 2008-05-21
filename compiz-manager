@@ -150,7 +150,7 @@ check_fbconfig()
 check_tfp()
 {
 	verbose "Checking for texture_from_pixmap: "
-	if [ $($GLXINFO 2>/dev/null | grep GLX_EXT_texture_from_pixmap -c) -gt 2 ] ; then
+	if [ $($GLXINFO 2>/dev/null | grep -c GLX_EXT_texture_from_pixmap) -gt 2 ] ; then
 		verbose "present. \n"
 		return 0;
 	else
