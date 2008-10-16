@@ -32,6 +32,7 @@ PLUGIN_PATH="/usr/local/lib/compiz/"
 GLXINFO="/usr/bin/glxinfo"
 KWIN="/usr/bin/kwin"
 METACITY="/usr/bin/metacity"
+XFWM="/usr/bin/xfwm"
 COMPIZ_NAME="compiz" # Final name for compiz (compiz.real) 
 
 # For Xgl LD_PRELOAD
@@ -46,8 +47,15 @@ NVIDIA_SETTINGS="nvidia-settings" # Assume it's in the path by default
 
 # For detecting what driver is in use, the + is for one or more /'s
 XORG_DRIVER_PATH="/usr/lib/xorg/modules/drivers/+"
+FALLBACKWM="xterm"
+if [ x"$KDE_FULL_SESSION" = x"true" ]; then 
+        FALLBACKWM="${KWIN}";
+elif [ x"$GNOME_DESKTOP_SESSION_ID" != x"" ]; then 
+        FALLBACKWM="${METACITY}"
+elif xprop -root _DT_SAVE_MODE | grep ' = \"xfce4\"$' >/dev/null 2>&1; then 
+        FALLBACKWM="${XFWM}"
+fi
 
-FALLBACKWM="${METACITY}"
 FALLBACKWM_OPTIONS="--replace $@"
 
 # Driver whitelist
