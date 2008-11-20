@@ -318,6 +318,9 @@ build_args()
 	if [ "x$INDIRECT" = "xyes" ]; then
 		COMPIZ_OPTIONS="$COMPIZ_OPTIONS --indirect-rendering "
 	fi
+	if [ ! -z "$DESKTOP_AUTOSTART_ID" ]; then
+		COMPIZ_OPTIONS="$COMPIZ_OPTIONS --sm-client-id $DESKTOP_AUTOSTART_ID"
+	fi
 	if check_nvidia; then
 		if [ "x$INDIRECT" != "xyes" ]; then
 			COMPIZ_OPTIONS="$COMPIZ_OPTIONS --loose-binding"
@@ -384,6 +387,7 @@ build_args
 
 if [ "x$CM_DRY" = "xyes" ]; then
 	verbose "Dry run finished: everything should work with regards to Compiz and 3D.\n"
+	verbose "Execute: ${COMPIZ_BIN_PATH}${COMPIZ_NAME} $COMPIZ_OPTIONS "$@" $COMPIZ_PLUGINS \n"
 	exit 0;
 fi
 # start the gtk-window-decorator if present
