@@ -46,7 +46,7 @@ NVIDIA_MEMORY="65536" # 64MB
 NVIDIA_SETTINGS="nvidia-settings" # Assume it's in the path by default
 
 # For detecting what driver is in use, the + is for one or more /'s
-XORG_DRIVER_PATH="/usr/lib/xorg/modules/drivers/+"
+XORG_DRIVER_PATH="/usr/lib/xorg/.*/+"
 FALLBACKWM="xterm"
 if [ x"$KDE_FULL_SESSION" = x"true" ]; then 
         FALLBACKWM="${KWIN}";
