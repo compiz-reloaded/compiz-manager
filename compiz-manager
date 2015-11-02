@@ -366,6 +366,9 @@ fi
 if [ -x ${COMPIZ_BIN_PATH}emerald ] && [ "$USE_EMERALD" = "yes" ]; then
 	verbose "Starting emerald\n"
 	${COMPIZ_BIN_PATH}emerald --replace &
+elif [ -x ${COMPIZ_BIN_PATH}gtk-window-decorator ] && ( [ "$XDG_CURRENT_DESKTOP" = "MATE" ] || [ -n "$MATE_DESKTOP_SESSION_ID" ] ); then
+	verbose "Starting gtk-window-decorator\n"
+	${COMPIZ_BIN_PATH}gtk-window-decorator --replace &
 elif [ -x ${COMPIZ_BIN_PATH}gtk-window-decorator ] && [ -n "$GNOME_DESKTOP_SESSION_ID" ]; then
 	verbose "Starting gtk-window-decorator\n"
 	${COMPIZ_BIN_PATH}gtk-window-decorator --replace &
