@@ -348,11 +348,9 @@ if ! check_fbconfig; then
 	abort_with_fallback_wm
 fi
 
-# load the ccp plugin if present and fallback to plain gconf if not
+# load the ccp plugin if present
 if [ -f ${PLUGIN_PATH}libccp.so ]; then
 	COMPIZ_PLUGINS="$COMPIZ_PLUGINS ccp"
-elif [ -f ${PLUGIN_PATH}libgconf.so ]; then
-	COMPIZ_PLUGINS="$COMPIZ_PLUGINS glib gconf"
 fi
 
 # get environment
