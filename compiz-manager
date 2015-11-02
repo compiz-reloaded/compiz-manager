@@ -72,8 +72,8 @@ COMPIZ_OPTIONS="--ignore-desktop-hints --replace"
 COMPIZ_PLUGINS=""
 ENV=""
 
-# Use emerald by default if it exist
-USE_EMERALD="yes"
+# Allow forcing Emerald
+USE_EMERALD=${USE_EMERALD:-no}
 
 # No indirect by default
 INDIRECT="no"
@@ -375,7 +375,13 @@ elif [ -x ${COMPIZ_BIN_PATH}kde-window-decorator ] && [ -n "$KDE_FULL_SESSION" ]
 	verbose "Starting kde-window-decorator\n"
 	${COMPIZ_BIN_PATH}kde-window-decorator --replace &
 	FALLBACKWM="${KWIN}"
+elif [ -x ${COMPIZ_BIN_PATH}emerald ]; then
+	verbose "Starting emerald\n"
+	${COMPIZ_BIN_PATH}emerald --replace &
+else
+	# Abort completely instead of having no window decoration
+	echo "No decoration manager found. Aborting..."
+	exit 1
 fi
 
 ${COMPIZ_BIN_PATH}${COMPIZ_NAME} $COMPIZ_OPTIONS "$@" $COMPIZ_PLUGINS || exec $FALLBACKWM $FALLBACKWM_OPTIONS
-
