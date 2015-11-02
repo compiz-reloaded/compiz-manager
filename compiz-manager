@@ -32,6 +32,7 @@ PLUGIN_PATH="/usr/local/lib/compiz/"
 GLXINFO="/usr/bin/glxinfo"
 KWIN="/usr/bin/kwin"
 METACITY="/usr/bin/metacity"
+MARCO="/usr/bin/marco"
 XFWM="/usr/bin/xfwm"
 COMPIZ_NAME="compiz" # Final name for compiz (compiz.real) 
 
@@ -52,6 +53,8 @@ if [ x"$KDE_FULL_SESSION" = x"true" ]; then
         FALLBACKWM="${KWIN}";
 elif [ x"$GNOME_DESKTOP_SESSION_ID" != x"" ]; then 
         FALLBACKWM="${METACITY}"
+elif [ x"$XDG_CURRENT_DESKTOP" = x"MATE" ] || [ x"$MATE_DESKTOP_SESSION_ID" != x"" ]; then
+        FALLBACKWM="${MARCO}"
 elif xprop -root _DT_SAVE_MODE | grep ' = \"xfce4\"$' >/dev/null 2>&1; then 
         FALLBACKWM="${XFWM}"
 fi
