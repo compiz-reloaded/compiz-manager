@@ -27,8 +27,16 @@
 # 
 
 
-COMPIZ_BIN_PATH="/usr/local/bin/" # For window decorators and compiz
-PLUGIN_PATH="/usr/local/lib/compiz/" 
+# LIBDIR differs between x86 and x86_64, arm and aarch64, ppc and ppc64
+ARCH="$(uname -m)"
+if [ -d '/usr/lib64/' ] && [[ "$ARCH" = *64 ]]; then
+       LIBDIR='/usr/lib64'
+else
+       LIBDIR='/usr/lib'
+fi
+
+COMPIZ_BIN_PATH="/usr/bin/" # For window decorators and compiz
+PLUGIN_PATH="$LIBDIR/compiz/"
 GLXINFO="/usr/bin/glxinfo"
 KWIN="/usr/bin/kwin"
 METACITY="/usr/bin/metacity"
@@ -43,7 +51,7 @@ NVIDIA_MEMORY="65536" # 64MB
 NVIDIA_SETTINGS="nvidia-settings" # Assume it's in the path by default
 
 # For detecting what driver is in use, the + is for one or more /'s
-XORG_DRIVER_PATH="/usr/lib/xorg/.*/+"
+XORG_DRIVER_PATH="$LIBDIR/xorg/.*/+"
 FALLBACKWM="xterm"
 if [ x"$KDE_FULL_SESSION" = x"true" ]; then 
         FALLBACKWM="${KWIN}";
