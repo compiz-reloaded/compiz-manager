@@ -226,15 +226,17 @@ check_nvidia()
 # Check if the max texture size is large enough compared to the resolution
 check_texture_size()
 {
-	TEXTURE_LIMIT=$(glxinfo -l | sed -n '/GL_MAX_TEXTURE_SIZE/ {s/.*=[^0-9]*//; p; q;}')
-	RESOLUTION=$(xdpyinfo | sed -n '/dimensions:/ {s/[^0-9]*//; s/[^0-9]*pixels.*//; p; q;}')
-	VRES=$(echo $RESOLUTION | cut -dx -f2)
-	HRES=$(echo $RESOLUTION | cut -dx -f1)
-	verbose "Comparing resolution ($RESOLUTION) to maximum 3D texture size ($TEXTURE_LIMIT): ";
-	if [ $VRES -gt $TEXTURE_LIMIT ] || [ $HRES -gt $TEXTURE_LIMIT ]; then
-		verbose "Failed.\n"
-		return 1;
-	fi
+	TEXTURE_LIMIT=$(glxinfo -l | sed -re '/GL_MAX_TEXTURE_SIZE/!d;s/^.*[ \t]([[:digit:]]+)$/\1/;q')
+	RESOLUTION=$(xdpyinfo | sed -re '/dimensions:/!d;s/^.*[ \t]([[:digit:]x]+) pixels.*$/\1/')
+	for res in $RESOLUTION; do
+		HRES=$(echo "$RESOLUTION" | cut -dx -f1)
+		VRES=$(echo "$RESOLUTION" | cut -dx -f2)
+		verbose "Comparing resolution ($res) to maximum 3D texture size ($TEXTURE_LIMIT): ";
+		if [ "$VRES" -gt "$TEXTURE_LIMIT" ] || [ "$HRES" -gt "$TEXTURE_LIMIT" ]; then
+			verbose "Failed.\n"
+			return 1;
+		fi
+	done
 	verbose "Passed.\n"
 	return 0
 }
