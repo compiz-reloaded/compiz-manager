@@ -181,6 +181,19 @@ check_tfp()
 	fi
 }
 
+# Check for Software Rasteriser
+check_sw()
+{
+	verbose "Checking for software rasteriser: "
+	if $GLXINFO 2>/dev/null | grep -q 'Software Rasterizer' ; then
+		verbose "present. \n"
+		return 1
+	else
+		verbose "not present. \n"
+		return 0
+	fi
+}
+
 # Check wether the composite extension is present
 check_composite()
 {
@@ -338,7 +351,7 @@ fi
 
 # check if we have the required bits to run compiz and if not,
 # fallback
-if ! check_tfp || ! check_npot_texture || ! check_composite || ! check_texture_size; then
+if ! check_sw || ! check_tfp || ! check_npot_texture || ! check_composite || ! check_texture_size; then
 	abort_with_fallback_wm
 fi
 
