@@ -62,17 +62,6 @@ fi
 
 FALLBACKWM_OPTIONS="--replace $@"
 
-# Driver whitelist
-WHITELIST="nvidia intel ati radeon i810 nouveau fglrx"
-
-# blacklist based on the pci ids 
-# See http://wiki.compiz-fusion.org/Hardware/Blacklist for details
-T="   1002:5954 1002:5854 1002:5955" # ati rs480
-T="$T 1002:4153" # ATI Rv350
-T="$T 8086:2982 8086:2992 8086:29a2 8086:2a02 8086:2a12"  # intel 965
-BLACKLIST_PCIIDS="$T"
-unset T
-
 COMPIZ_OPTIONS="--ignore-desktop-hints --replace"
 COMPIZ_PLUGINS=""
 ENV=""
@@ -104,7 +93,7 @@ abort_with_fallback_wm()
 		verbose "SKIP_CHECKS is yes, so continuing despite problems.\n"
 		return 0;
 	fi
-	
+
 	if [ "x$CM_DRY" = "xyes" ]; then
 		verbose "Dry run failed: Problems detected with 3D support.'n"
 		exit 1;
@@ -139,10 +128,10 @@ check_fbconfig()
 {
 	verbose "Checking for FBConfig: "
 	if [ "$INDIRECT" = "yes" ]; then
-		$GLXINFO -i | grep -q GLX.*fbconfig 
+		$GLXINFO -i | grep -q GLX.*fbconfig
 		FB=$?
 	else
-		$GLXINFO | grep -q GLX.*fbconfig 
+		$GLXINFO | grep -q GLX.*fbconfig
 		FB=$?
 	fi
 
@@ -254,45 +243,6 @@ check_texture_size()
 	return 0
 }
 
-# check driver whitelist
-running_under_whitelisted_driver()
-{
-	LOG=$(xset q|grep "Log file"|awk '{print $3}')
-	if [ "$LOG" = "" ]; then
-	    verbose "xset q doesn't reveal the location of the log file. Using fallback $XORG_DEFAULT_LOG \n"
-	    LOG=$XORG_DEFAULT_LOG;
-	fi
-	if [ -z "$LOG" ];then
-		verbose "AIEEEEH, no Log file found \n"
-		verbose "$(xset q) \n"
-	return 0
-	fi
-	for DRV in ${WHITELIST}; do
-		if egrep -q "Loading ${XORG_DRIVER_PATH}${DRV}_drv\.so" $LOG &&
-		   ! egrep -q "Unloading ${XORG_DRIVER_PATH}${DRV}_drv\.so" $LOG; 
-		then
-			return 0
-		fi
-	done
-	verbose "No whitelisted driver found\n"
-	return 1
-}
-
-# check pciid blacklist
-have_blacklisted_pciid()
-{
-	OUTPUT=$(/sbin/lspci -n)
-	for ID in ${BLACKLIST_PCIIDS}; do
-		if echo "$OUTPUT" | egrep -q "$ID"; then
-			verbose "Blacklisted PCIID '$ID' found \n"
-			return 0
-		fi
-	done
-	OUTPUT=$(/sbin/lspci -vn | grep -i VGA)
-	verbose "Detected PCI ID for VGA: $OUTPUT\n"
-	return 1
-}
-
 build_env()
 {
 	if check_nvidia; then
@@ -342,11 +292,6 @@ fi
 
 if [ "x$LIBGL_ALWAYS_INDIRECT" = "x1" ]; then
 	INDIRECT="yes";
-fi
-
-# if vesa or vga are in use, do not even try glxinfo (lp#119341)
-if ! running_under_whitelisted_driver || have_blacklisted_pciid; then
-	abort_with_fallback_wm
 fi
 
 # check if we have the required bits to run compiz and if not,
