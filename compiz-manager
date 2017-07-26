@@ -67,7 +67,7 @@ COMPIZ_PLUGINS=""
 ENV=""
 
 # Allow forcing Emerald.
-USE_EMERALD="${USE_EMERALD:-no}"
+USE_EMERALD="${USE_EMERALD:-yes}"
 
 # Default X.org log if xset q doesn't reveal it.
 XORG_DEFAULT_LOG="/var/log/Xorg.0.log"
