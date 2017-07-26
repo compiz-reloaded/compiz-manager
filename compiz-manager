@@ -67,8 +67,7 @@ COMPIZ_PLUGINS=""
 ENV=""
 
 # Allow forcing Emerald.
-USE_EMERALD="${USE_EMERALD:-yes}" # emerald is great!!!!
-
+USE_EMERALD="${USE_EMERALD:-no}"
 # Default X.org log if xset q doesn't reveal it.
 XORG_DEFAULT_LOG="/var/log/Xorg.0.log"
 
@@ -197,8 +196,7 @@ check_composite()
 check_nvidia_memory()
 {
     MEM=$("$NVIDIA_SETTINGS" -q VideoRam | grep "Attribute 'VideoRam' .*:" | grep -v '])' | cut -d: -f3 | sed 's/[^0-9]//g')
-    # grep -v '])' avoid fail if 2 or more GPU are present
-	if [ "$MEM" -lt "$NVIDIA_MEMORY" ]; then
+    	if [ "$MEM" -lt "$NVIDIA_MEMORY" ]; then
 		verbose "Less than ${NVIDIA_MEMORY}kb of memory and NVIDIA"
 		return 1
 	fi
