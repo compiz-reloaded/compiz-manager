@@ -49,8 +49,6 @@ COMPIZ_NAME="compiz" # Final name for compiz (compiz.real).
 NVIDIA_MEMORY="65536" # 64MiB.
 NVIDIA_SETTINGS="nvidia-settings" # Assume it's in the path by default.
 
-# For detecting what driver is in use, the + is for one or more /'s.
-XORG_DRIVER_PATH="$LIBDIR/xorg/.*/+"
 FALLBACKWM="xterm"
 if [[ "$XDG_CURRENT_DESKTOP" == "MATE" ]] || [ ! -z "$MATE_DESKTOP_SESSION_ID" ]; then
 	FALLBACKWM="$MARCO"
